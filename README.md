@@ -1,4 +1,4 @@
-# GNOME Battery Extension
+# GNOME Shell Battery Extension
 
 ## Requirements
 
@@ -16,7 +16,7 @@ To activate this extension, you must have the **Extension** and **Extension Mana
 3. Open the **Extensions** app and activate the extension.
 
 ### In Extensions App  
-![In Extensions app](https://drive.google.com/uc?export=view&id=1XVOB9TU1oe2AP4ty7xopHLQMfUiLU>]
+![In Extensions app](https://drive.google.com/uc?export=view&id=1XVOB9TU1oe2AP4ty7xopHLQMfUiLU>)
 
 ## Compatibility
 
