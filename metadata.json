@@ -1,0 +1,10 @@
+{
+  "uuid": "ascii-battery-replacement@alemany",
+  "name": "ASCII Battery Indicator",
+  "description": "Displays battery, volume, wifi and brightness as ASCII in top bar.",
+  "shell-version": ["40", "41", "42", "43", "44", "45"],
+  "url": "https://github.com/example/ascii-indicator",
+  "version": 5,
+  "settings-schema": "org.gnome.shell.extensions.ascii-indicator",
+  "main": "extension.js"
+}
