@@ -1,5 +1,9 @@
 # GNOME Shell System Stats Extension
 
+## What it does
+
+Hide the original system stats indicator from above right on your screen and adds a new one with ASCII characters which changes colors depending on your remaining battery (if using a laptop)
+
 ## Requirements
 
 To activate this extension, you must have the **Extension** and **Extension Manager** apps installed on your Linux system. You can find them in the Software app.
@@ -20,8 +24,8 @@ To activate this extension, you must have the **Extension** and **Extension Mana
 
 ## Compatibility
 
-✅ Tested on **Ubuntu 22.04 LTS**.  
-⚠️ Compatibility with other distributions or versions is not guaranteed.
+✅ Tested on a **laptop** with **Ubuntu 22.04 LTS**.  
+⚠️ Compatibility with other distributions, versions or devices is not guaranteed (with a PC it should just remove the battery indicator).
 
 ## Preview
 
