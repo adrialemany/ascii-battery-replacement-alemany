@@ -1,4 +1,4 @@
-# GNOME Shell Battery Extension
+# GNOME Shell System Stats Extension
 
 ## Requirements
 
