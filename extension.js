@@ -2,7 +2,15 @@
 const { St, Gio, GLib, Clutter, GObject } = imports.gi;
 const Main = imports.ui.main;
 
-const BATTERY_PATH = '/org/freedesktop/UPower/devices/battery_BAT1';
+function getBatteryPath() {
+    let upowerPaths = GLib.spawn_command_line_sync('upower -e')[1]
+        .toString()
+        .trim()
+        .split('\n');
+    return upowerPaths.find(p => p.includes('battery_')) || null;
+}
+
+let BATTERY_PATH = getBatteryPath();
 
 function getAsciiBar(percent) {
     const filled = Math.floor(percent / 10);
@@ -112,7 +120,6 @@ function enable() {
     const menu = Main.panel.statusArea.aggregateMenu;
     if (!menu) return;
 
-    // Proxy para batería
     Gio.DBusProxy.new(
         Gio.DBus.system,
         Gio.DBusProxyFlags.NONE,
@@ -126,10 +133,8 @@ function enable() {
         }
     );
 
-    // Limpiar hijos previos
     menu.remove_all_children();
 
-    // Crear y añadir label personalizado
     asciiLabel = new St.Label({
         text: 'Loading...',
         y_align: Clutter.ActorAlign.CENTER,
@@ -138,7 +143,6 @@ function enable() {
 
     menu.add_child(asciiLabel);
 
-    // Actualizar cada 2s
     timeoutId = GLib.timeout_add_seconds(GLib.PRIORITY_LOW, 5, () => {
         updateAsciiIndicator();
         return true;
@@ -146,27 +150,42 @@ function enable() {
 }
 
 function updateAsciiIndicator() {
-    if (!asciiLabel || !batteryProxy) return;
+    if (!asciiLabel) return;
 
-    let batteryProp = batteryProxy.get_cached_property('Percentage');
-    if (!batteryProp) return;
+    let battery = batteryProxy
+        ? Math.floor(batteryProxy.get_cached_property('Percentage').unpack())
+        : null;
 
-    let battery = Math.floor(batteryProp.unpack());
-    let stateProp = batteryProxy.get_cached_property('State');
-    let state = stateProp ? stateProp.unpack() : 0;
+    let state = batteryProxy && batteryProxy.get_cached_property('State')
+        ? batteryProxy.get_cached_property('State').unpack()
+        : 0;
 
     getBrightnessPercentAsync(brightness => {
         getVolumePercentAsync(volume => {
             getWifiStatusAsync(wifi => {
                 if (volume === null) volume = 0;
                 let brightnessVisual = brightness !== null ? getBrightnessVisual(brightness) : '??';
-                let batteryBar = getAsciiBar(battery);
                 let volumeBar = getVolumeVisual(volume);
 
-                let color = state === 1 ? "#44ff44" : (battery < 20 ? "#ff4444" : "#00cccc");
+                // Construir la línea sin batería si no hay
+                let parts = [
+                    `VOL ${volumeBar}`,
+                    `BRI ${brightnessVisual}`,
+                    wifi
+                ];
+
+                if (battery !== null) {
+                    let batteryBar = getAsciiBar(battery);
+                    parts.push(`BAT ${batteryBar}`);
+                }
+
+                // Estilo depende del estado de la batería, o gris si no hay
+                let color = battery === null
+                    ? "#cccccc"
+                    : (state === 1 ? "#44ff44" : (battery < 20 ? "#ff4444" : "#00cccc"));
 
                 asciiLabel.set_style(`color: ${color}; font-family: monospace; font-size: 12px; padding-left: 6px; padding-right: 6px;`);
-                asciiLabel.set_text(`VOL ${volumeBar}  BRI ${brightnessVisual}  ${wifi}  BAT ${batteryBar}`);
+                asciiLabel.set_text(parts.join('  '));
             });
         });
     });
@@ -182,5 +201,4 @@ function disable() {
     asciiLabel.destroy();
     asciiLabel = null;
 
-    // No restaura íconos automáticamente (puede agregarse si se desea)
 }
